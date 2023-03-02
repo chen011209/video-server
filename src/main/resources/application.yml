@@ -1,0 +1,45 @@
+# 应用名称
+spring:
+  application:
+    name: video
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/video?useUnicode=true&characterEncoding=UTF8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC
+    username: root
+    password: root
+    # 链接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 链接池初始化大小
+      initial-size: 8
+      # 最大活跃数
+      max-active: 16
+      # 最小空闲数
+      min-idle: 1
+      # 最大等待时间
+      max-wait: 60000
+
+# mybatis配置
+mybatis:
+  check-config-location: true
+  #  mybatis框架配置文件，对mybatis的生命周期起作用
+  config-location: classpath:mybatis/config/mybatis-config.xml
+  #  配置xml路径
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  #  配置model包路径
+  type-aliases-package: com.yichen.video.model.*
+
+
+
+# 应用服务 WEB 访问端口
+server:
+  port: 8080
+
+
+#存放视频的地址
+resource:
+  video-path: D:\bishe\video-repository\
+
+
+
+
