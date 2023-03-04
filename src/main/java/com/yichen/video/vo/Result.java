@@ -12,21 +12,25 @@ import java.util.List;
 public class Result {
 
     private Boolean success;
-    private String errorMsg;
+    private Integer errorCode;
+    private String msg;
     private Object data;
     private Long total;
 
     public static Result ok(){
-        return new Result(true, null, null, null);
+        return new Result(true, null, null, null,null);
     }
     public static Result ok(Object data){
-        return new Result(true, null, data, null);
+        return new Result(true, null,null , data,null);
+    }
+    public static Result ok(Object data,String msg){
+        return new Result(true, null,msg , data,null);
     }
     public static Result ok(List<?> data, Long total){
-        return new Result(true, null, data, total);
+        return new Result(true, null,null ,data ,total);
     }
-    public static Result fail(String errorMsg){
-        return new Result(false, errorMsg, null, null);
+    public static Result fail(Integer errorCode,String msg){
+        return new Result(false, errorCode, msg, null,null);
     }
 
 }

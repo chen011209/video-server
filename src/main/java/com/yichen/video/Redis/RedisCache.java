@@ -8,16 +8,12 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-//@SuppressWarnings(value = { "unchecked", "rawtypes" })
+@SuppressWarnings(value = { "unchecked", "rawtypes" })
 @Component
 public class RedisCache
 {
     @Autowired
     public RedisTemplate redisTemplate;
-
-
-//    @Autowired
-//    private StringRedisTemplate redisTemplate;
 
 
     /**
@@ -28,7 +24,6 @@ public class RedisCache
      */
     public <T> void setCacheObject(final String key, final T value)
     {
-        System.out.println(key);
         redisTemplate.opsForValue().set(key, value);
     }
 

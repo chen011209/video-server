@@ -27,11 +27,11 @@ class VideoApplicationTests {
          * 底层是通过【加密盐】和原文进行一系列处理之后再进行加密
          * 这样的话，虽然明文一样，但是每一次的密文都是不一样的
          */
-        String encode_pwd_1 = passwordEncoder.encode("1234");
-        String encode_pwd_2 = passwordEncoder.encode("rabbit");
+        String encode_pwd_1 = passwordEncoder.encode("4124");
+        String encode_pwd_2 = passwordEncoder.encode("12aesCCdfsef34");
 
         System.out.println(encode_pwd_1);
-        System.out.println(encode_pwd_2);
+        System.out.println(encode_pwd_2.length());
 
 
     }

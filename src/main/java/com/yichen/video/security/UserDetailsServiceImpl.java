@@ -1,14 +1,21 @@
 package com.yichen.video.security;
 
-import com.yichen.video.dao.UserMapper;
-import com.yichen.video.vo.User;
 
+import com.yichen.video.dao.UserMapper;
+
+
+import com.yichen.video.model.User;
+import com.yichen.video.model.UserExample;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -16,7 +23,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Resource
     private UserMapper userMapper;
-
 
 
     //UsernamePasswordAuthenticationToken authenticationToken
@@ -30,43 +36,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
 
-        // 根据用户名查询用户信息
-//        String name = userMapper.selectByPrimaryKey(1L).getUserName();
+
+        UserExample userExample = new UserExample();
+        userExample.setDistinct(true);
+        UserExample.Criteria userCriteria = userExample.createCriteria();
+
+        userCriteria.andUserEmailEqualTo(mail);
 
 
-
-        User user = new User();
-        user.setId(11L);
-//        user.setBirthday(LocalDateTime.now());
-//        user.setGender("1234");
-//        user.setUsername("1234");
-//        user.setMail("1234");
-
-        if(mail.equals("1234")){
-            user.setPassword("$2a$10$xcKRWSAEYH6xRnJkofPAtu.qIERpgZMK5U7wSPbkTxGxzIKTRoFbO");
-        }
-        else
-            user.setPassword("$2a$10$xcKRWSAEYH6K5U7wSPbkTxGxzIKTRoFbO");
-
-//        user.setTelephone("1234");
-//        user.setStation("1234");
-//        user.setRemark("1234");
+        //只要按照mail将数据库中的user取出(主要是密码) 后续security会在authenticate方法中比对密码
+        User user = userMapper.selectByExample(userExample).get(0);
 
 
-
-        /**
-         * 若查询不到用户信息，则抛异常
-         * SpringSecurity可以处理我们在查询中遇到的异常
-         */
-        if (Objects.isNull(user)) {
-            throw new RuntimeException("用户账号或密码错误");
-        }
-
-        // TODO 根据用户查询权限信息，添加到LoginUser中
-
+//        if (userList.size()==0) {
+//            throw new RuntimeException("用户账号或密码错误");
+//        }
 
         // 因为返回值是UserDetails，所有需要定义一个类，实现UserDetails，把用户信息封装在其中
-        return new LoginUser(user);
+        //根据用户查询权限信息 添加到LoginUser中
+        List<String> list;
+        if(user.getType()==1){
+            list = new ArrayList<>(Arrays.asList("USER"));
+        }else {
+            list = new ArrayList<>(Arrays.asList("ADMIN"));
+
+        }
+        return new LoginUser(user,list);
+
     }
 }
 

@@ -2,12 +2,17 @@ package com.yichen.video.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.yichen.video.Redis.RedisCache;
+import com.yichen.video.dao.UserMapper;
 import com.yichen.video.dto.LoginDto;
+import com.yichen.video.dto.RegisterDto;
+import com.yichen.video.enums.ErrorEnum;
+import com.yichen.video.enums.UserTypeEnum;
+import com.yichen.video.model.User;
+import com.yichen.video.model.UserExample;
 import com.yichen.video.service.UserService;
 import com.yichen.video.security.LoginUser;
 import com.yichen.video.util.JwtUtil;
 import com.yichen.video.vo.Result;
-import com.yichen.video.vo.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,9 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +40,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RedisCache redisCache;
 
+    @Autowired
+    UserMapper userMapper;
+
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     /**
@@ -42,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result loginByPassword(LoginDto loginDto) {
 
-        // 第一个参数是账号 第二个参数是密码
+        // 第一个参数是账号 第二个参数是密码 数据在UserDetailsServiceImpl中取
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getMail(),loginDto.getPassword());
         Authentication authenticate;
         try{
@@ -54,26 +67,76 @@ public class UserServiceImpl implements UserService {
 //            }
         }catch (Exception e){
             logger.error("用户名或密码错误！");
-            return Result.fail("用户名或密码错误");
+            return Result.fail(ErrorEnum.LOGIN_FAILED.getCode(),"用户名或密码错误");
 
         }
 
 
         //使用userid生成token
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
-        String userId = loginUser.getUser().getId().toString();
+        String userId = loginUser.getUser().getUserId().toString();
         String jwt = JwtUtil.createJWT(userId);
-        //authenticate存入redis
-        redisCache.setCacheObject("login:"+userId,loginUser);
+
+
+        String preFix = null;
+        //authenticate存入redis   50分钟后后用户到期
+        if(loginUser.getUser().getType()== UserTypeEnum.USER.getCode().byteValue()){
+            preFix = "user:";
+        }else if(loginUser.getUser().getType()== UserTypeEnum.ADMIN.getCode().byteValue()){
+            preFix = "admin:";
+        }
+        redisCache.setCacheObject(preFix+userId,loginUser,50, TimeUnit.MINUTES);
+
         //把token响应给前端
         HashMap<String,String> map = new HashMap<>();
         map.put("token",jwt);
 
 
-        logger.info("用户成功登录,id为:{}",loginUser.getUser().getId());
+        logger.info("用户成功登录,id为:{}",loginUser.getUser().getUserId());
 
-        return Result.ok(map);
+        return Result.ok(map,loginUser.getUser().getType().toString());
     }
+
+    @Override
+    public Result logOut() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+
+        User user = loginUser.getUser();
+
+        Long userid = user.getUserId();
+
+        if(user.getType()==UserTypeEnum.USER.getCode().byteValue()){
+            redisCache.deleteObject("user:"+userid);
+        }else {
+            redisCache.deleteObject("admin:"+userid);
+
+        }
+        return Result.ok();
+    }
+
+    @Override
+    public Result register(RegisterDto registerDto) {
+        try {
+            User user = new User();
+
+            user.setUserName(registerDto.getUserName());
+            user.setUserEmail(registerDto.getUserEmail());
+            user.setSignature(registerDto.getSignature());
+            user.setType(registerDto.getType());
+            user.setUserLevel((byte) 0);
+            user.setUserLevelPoints(0);
+            user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+
+
+            userMapper.insert(user);
+        }catch (Exception e){
+            return Result.fail(ErrorEnum.REGISTER_FAILED.getCode(), e.getMessage());
+        }
+
+        return Result.ok();
+    }
+
 
 
     @Override
