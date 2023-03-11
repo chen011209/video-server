@@ -79,13 +79,17 @@ public class UserServiceImpl implements UserService {
 
 
         String preFix = null;
-        //authenticate存入redis   50分钟后后用户到期
+        //authenticate存入redis   3天后后用户到期
         if(loginUser.getUser().getType()== UserTypeEnum.USER.getCode().byteValue()){
             preFix = "user:";
         }else if(loginUser.getUser().getType()== UserTypeEnum.ADMIN.getCode().byteValue()){
             preFix = "admin:";
         }
-        redisCache.setCacheObject(preFix+userId,loginUser,50, TimeUnit.MINUTES);
+//        redisCache.setCacheObject(preFix+userId,loginUser,3, TimeUnit.DAYS);
+
+
+        //设置用户不到期 除非用户退出登录
+        redisCache.setCacheObject(preFix+userId,loginUser);
 
         //把token响应给前端
         HashMap<String,String> map = new HashMap<>();
@@ -131,7 +135,9 @@ public class UserServiceImpl implements UserService {
 
             userMapper.insert(user);
         }catch (Exception e){
-            return Result.fail(ErrorEnum.REGISTER_FAILED.getCode(), e.getMessage());
+            logger.error("注册失败:"+e.getMessage());
+
+            return Result.fail(ErrorEnum.REGISTER_FAILED.getCode(), "注册失败");
         }
 
         return Result.ok();

@@ -2,6 +2,11 @@
 spring:
   application:
     name: video
+
+  servlet:
+    multipart:
+      max-file-size: 1073741824
+      max-request-size: 1073741824
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/video?useUnicode=true&characterEncoding=UTF8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=UTC
@@ -52,7 +57,9 @@ server:
 
 #存放视频的地址
 resource:
-  video-path: D:\bishe\video-repository\
+  video-path: D:\bishe\video-repository\video
+  picture-path: D:\bishe\video-repository\picture
+  upload-path: D:\bishe\video-repository\upload
 
 
 
