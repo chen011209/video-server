@@ -28,14 +28,18 @@ public class UserController {
         return userService.loginByPassword(loginDto);
     }
 
-    @GetMapping("/user/logout")
+    @PostMapping("/user/logout")
     public Result logOut(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("yaah");
         return userService.logOut();
     }
 
 
     @PostMapping("/user/register")
     public Result registerUser(HttpServletRequest request, HttpServletResponse response, @RequestBody RegisterDto registerDto) {
+
+
 
         registerDto.setType(UserTypeEnum.USER.getCode().byteValue());
         return userService.register(registerDto);

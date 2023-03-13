@@ -44,7 +44,9 @@
         </javaClientGenerator>
 
         <!-- 数据表进行生成操作 schema:相当于库名; tableName:表名; domainObjectName:对应的DO -->
-        <table schema="${schema}" tableName="t_user" domainObjectName="User">
+<!--        <table schema="${schema}" tableName="t_user" domainObjectName="User">-->
+<!--        </table>-->
+        <table schema="${schema}" tableName="t_check_video" domainObjectName="CheckVideo">
         </table>
 <!--        <table schema="${schema}" tableName="t_admin" domainObjectName="Admin">-->
 <!--        </table>-->

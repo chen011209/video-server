@@ -8,6 +8,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 @SpringBootTest
@@ -15,6 +18,13 @@ class VideoApplicationTests {
 
     @Test
     void contextLoads() {
+
+
+        try {
+            InputStream inputStream = new FileInputStream("inputFile");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

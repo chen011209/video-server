@@ -94,11 +94,28 @@ public class UserServiceImpl implements UserService {
         //把token响应给前端
         HashMap<String,String> map = new HashMap<>();
         map.put("token",jwt);
+        map.put("userType",loginUser.getUser().getType().toString());
 
 
         logger.info("用户成功登录,id为:{}",loginUser.getUser().getUserId());
 
+
+
+//        UserInfo userInfo = new UserInfo();
+
+
         return Result.ok(map,loginUser.getUser().getType().toString());
+    }
+
+
+    class UserInfo{
+        String token;
+        Integer userType;
+
+        public UserInfo(String token, Integer userType) {
+            this.token = token;
+            this.userType = userType;
+        }
     }
 
     @Override
