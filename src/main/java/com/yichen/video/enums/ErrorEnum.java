@@ -9,7 +9,8 @@ public enum ErrorEnum {
     REGISTER_FAILED(2),
     UPLOAD_FAIL(3),
     FILE_ERROR(4),
-    SQL_ERROR(5)
+    SQL_ERROR(5),
+    ERROR_CHECK_STATUS(6)
     ;
 
     private Integer code;

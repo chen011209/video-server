@@ -1,7 +1,11 @@
 package com.yichen.video.service;
 
+import com.github.pagehelper.PageInfo;
+import com.yichen.video.dto.CheckVideoDto;
 import com.yichen.video.dto.UploadDto;
+import com.yichen.video.model.Comment;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.VideoVo;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,8 +23,20 @@ public interface VideoService {
     Result uploadVideo(UploadDto uploadDto);
 
 
-    Result getCheckVideoList();
+    Result getCheckVideoList(Integer len);
 
     void getPicture(HttpServletResponse response,String picturePath);
+
+    Result checkVideo(CheckVideoDto checkVideoDto);
+
+
+    Result getCheckVideoInfo(Long checkVideoId);
+
+    Result getVideoInfo(Long videoId);
+
+
+
+
+    PageInfo<VideoVo> getPopularVideoList(int pageNum, int pageSize);
 
 }

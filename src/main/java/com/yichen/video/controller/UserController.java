@@ -17,26 +17,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/user")
 @CrossOrigin
 public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public Result login(HttpServletRequest request, HttpServletResponse response,@RequestBody LoginDto loginDto) {
         return userService.loginByPassword(loginDto);
     }
 
-    @PostMapping("/user/logout")
+    @PostMapping("/logout")
     public Result logOut(HttpServletRequest request, HttpServletResponse response) {
-
-        System.out.println("yaah");
         return userService.logOut();
     }
 
 
-    @PostMapping("/user/register")
+    @PostMapping("/register")
     public Result registerUser(HttpServletRequest request, HttpServletResponse response, @RequestBody RegisterDto registerDto) {
 
 
@@ -46,7 +44,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/user/admin/register")
+    @PostMapping("/admin/register")
     public Result registerAdmin(HttpServletRequest request, HttpServletResponse response, @RequestBody RegisterDto registerDto) {
         registerDto.setType(UserTypeEnum.ADMIN.getCode().byteValue());
         return userService.register(registerDto);

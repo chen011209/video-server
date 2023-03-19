@@ -57,9 +57,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<String> list;
         if(user.getType()==1){
             list = new ArrayList<>(Arrays.asList("USER"));
-        }else {
+        }else if(user.getType()==0){
             list = new ArrayList<>(Arrays.asList("ADMIN"));
-
+        }else {
+            list = new ArrayList<>(Arrays.asList("SUPER_ADMIN"));
         }
         return new LoginUser(user,list);
 

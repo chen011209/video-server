@@ -55,6 +55,18 @@ server:
   port: 8080
 
 
+#pagehelper:
+#  offsetAsPageNum: true
+#  rowBoundsWithCount: true
+#  reasonable: true
+#  returnPageInfo: true
+#  params: count=countSql
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
 #存放视频的地址
 resource:
   video-path: D:\bishe\video-repository\video

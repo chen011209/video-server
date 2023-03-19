@@ -1,19 +1,21 @@
 package com.yichen.video.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.yichen.video.dao.CheckVideoMapper;
+import com.yichen.video.dao.VideoMapper;
+import com.yichen.video.dto.CheckVideoDto;
 import com.yichen.video.dto.UploadDto;
 import com.yichen.video.enums.CheckVideoStatusEnum;
 import com.yichen.video.enums.ErrorEnum;
 import com.yichen.video.enums.UserTypeEnum;
-import com.yichen.video.model.CheckVideo;
-import com.yichen.video.model.CheckVideoExample;
-import com.yichen.video.model.User;
-import com.yichen.video.model.UserExample;
+import com.yichen.video.model.*;
 import com.yichen.video.security.LoginUser;
 import com.yichen.video.service.VideoService;
 import com.yichen.video.util.NonStaticResourceHttpRequestHandler;
 import com.yichen.video.vo.CheckVideoVo;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.VideoVo;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,8 @@ public class VideoServiceImpl implements VideoService {
     private NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
 
 
+    @Autowired
+    private VideoMapper videoMapper;
 
     @Autowired
     private CheckVideoMapper checkVideoMapper;
@@ -211,15 +215,17 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public Result getCheckVideoList() {
+    public Result getCheckVideoList(Integer len) {
 
-        List<CheckVideoVo> checkVideoArrayList = checkVideoMapper.getCheckVideoList(16);
+        List<CheckVideoVo> checkVideoArrayList = checkVideoMapper.getCheckVideoList(len);
 
 
         for(CheckVideoVo checkVideoVo:checkVideoArrayList){
             checkVideoVo.setPicturePath("http://127.0.0.1:8080/video/picture?picturePath="+checkVideoVo.getPicturePath().replace('\\','/'));
-            checkVideoVo.setVideoPath("http://127.0.0.1:8080/video/video?videoPath="+checkVideoVo.getVideoPath().replace('\\','/'));
+//            checkVideoVo.setVideoPath("http://127.0.0.1:8080/video/video?videoPath="+checkVideoVo.getVideoPath().replace('\\','/'));
         }
+
+
 
 
         return Result.ok(checkVideoArrayList);
@@ -243,6 +249,112 @@ public class VideoServiceImpl implements VideoService {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Result checkVideo(CheckVideoDto checkVideoDto) {
+
+        //更新checkVideo表
+
+
+        if(checkVideoDto.getStatus()!=CheckVideoStatusEnum.CHECKED.getCode()
+                &&checkVideoDto.getStatus()!=CheckVideoStatusEnum.FAIL.getCode()){
+            return Result.fail(ErrorEnum.ERROR_CHECK_STATUS.getCode(),"审核状态错误");
+        }
+
+        Long sysTime = System.currentTimeMillis();
+
+        CheckVideo checkVideo = new CheckVideo();
+        checkVideo.setCheckVideoId(checkVideoDto.getCheckVideoId());
+        checkVideo.setStatus(checkVideoDto.getStatus().byteValue());
+        checkVideo.setCheckTime(sysTime);
+        checkVideo.setRemark(checkVideoDto.getRemark());
+
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+
+        User checkUser = loginUser.getUser();
+
+
+        checkVideo.setCheckAdminId(checkUser.getUserId());
+
+
+//        CheckVideoExample checkVideoExample = new CheckVideoExample();
+//        checkVideoExample.createCriteria().andCheckVideoIdEqualTo(checkVideoDto.getCheckVideoId());
+
+
+        checkVideoMapper.updateByPrimaryKeySelective(checkVideo);
+
+//        checkVideoMapper.updateByExample(checkVideo, checkVideoExample);
+
+
+        //插入一条新的video记录
+
+        CheckVideo checkVideoInfo = checkVideoMapper.selectByPrimaryKey(checkVideoDto.getCheckVideoId());
+
+
+        Video video = new Video();
+        video.setCheckVideoId(checkVideoInfo.getCheckVideoId());
+        video.setVideoTitle(checkVideoInfo.getCheckVideoTitle());
+        video.setVideoIntroduction(checkVideoInfo.getCheckVideoIntroduction());
+        video.setUserId(checkVideoInfo.getUserId());
+        video.setVideoPath(checkVideoInfo.getVideoPath());
+        video.setPicturePath(checkVideoInfo.getPicturePath());
+//        video.setDownvoteNum(0);
+//        video.setPraiseNum(0);
+        video.setReleaseTime(sysTime);
+        video.setViewNum(0);
+
+        videoMapper.insert(video);
+
+        return Result.ok();
+    }
+
+    @Override
+    public Result getCheckVideoInfo(Long checkVideoId) {
+
+        CheckVideo checkVideo = checkVideoMapper.selectByPrimaryKey(checkVideoId);
+
+
+        //将数据库中的本地路径 转为可以直接通过接口访问的路径
+        checkVideo.setPicturePath("http://127.0.0.1:8080/video/picture?picturePath="+checkVideo.getPicturePath().replace('\\','/'));
+        checkVideo.setVideoPath("http://127.0.0.1:8080/video/video?videoPath="+checkVideo.getVideoPath().replace('\\','/'));
+
+        return Result.ok(checkVideo);
+    }
+
+    @Override
+    public Result getVideoInfo(Long videoId) {
+
+        Video video = videoMapper.selectByPrimaryKey(videoId);
+
+
+        video.setPicturePath("http://127.0.0.1:8080/video/picture?picturePath="+video.getPicturePath().replace('\\','/'));
+        video.setVideoPath("http://127.0.0.1:8080/video/video?videoPath="+video.getVideoPath().replace('\\','/'));
+
+        return Result.ok(video);
+
+    }
+
+    @Override
+    public PageInfo<VideoVo> getPopularVideoList(int pageNum, int pageSize) {
+
+
+        PageHelper.startPage(pageNum, pageSize);
+        // 调用Mapper接口方法
+
+
+        List<VideoVo> videoVoList = videoMapper.getVideoList();
+
+        for(VideoVo videoVo:videoVoList){
+            videoVo.setPicturePath("http://127.0.0.1:8080/video/picture?picturePath="+videoVo.getPicturePath().replace('\\','/'));
+
+        }
+
+
+        return new PageInfo<>(videoVoList);
+
     }
 
 

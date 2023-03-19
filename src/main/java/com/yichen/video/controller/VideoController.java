@@ -1,11 +1,18 @@
 package com.yichen.video.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.sun.org.apache.bcel.internal.classfile.Code;
+import com.yichen.video.dto.CheckVideoDto;
+import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.dto.UploadDto;
+import com.yichen.video.model.Comment;
+import com.yichen.video.service.RecommendService;
 import com.yichen.video.service.VideoService;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.VideoVo;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,8 +33,16 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
+    @Autowired
+    private RecommendService recommendService;
 
-
+    /**
+     * 上传一个视频所有的信息 包括标题、简介
+     * @param request
+     * @param response
+     * @param uploadDto
+     * @return
+     */
     @PostMapping("/upload")
     public Result postVideo(HttpServletRequest request, HttpServletResponse response
             , @RequestBody UploadDto uploadDto){
@@ -36,6 +51,14 @@ public class VideoController {
         return videoService.uploadVideo(uploadDto);
     }
 
+
+    /**
+     * 上传文件
+     * @param request
+     * @param response
+     * @param file
+     * @return
+     */
     @PostMapping("/uploadfile")
     public Result uploadFile(HttpServletRequest request, HttpServletResponse response
             , @RequestParam("file") MultipartFile file
@@ -51,13 +74,38 @@ public class VideoController {
 //        return videoService.getCheckVideoList();
 //    }
 
-
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping("/checkVideoList")
-    public Result getCheckVideoList(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        return videoService.getCheckVideoList();
+    public Result getCheckVideoList(HttpServletRequest request, HttpServletResponse response,@RequestParam Integer len) throws Exception{
+        return videoService.getCheckVideoList(len);
     }
 
 
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("/check")
+    public Result checkVideo(HttpServletRequest request, HttpServletResponse response, @RequestBody CheckVideoDto checkVideoDto){
+        return videoService.checkVideo(checkVideoDto);
+    }
+
+
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @GetMapping("/check/videoInfo")
+    public Result getCheckVideoInfo(HttpServletRequest request, HttpServletResponse response, @RequestParam Long checkVideoId){
+        return videoService.getCheckVideoInfo(checkVideoId);
+    }
+
+    // TODO: 2023/3/14 获取下个视频不能和现在视频重复 
+//    @GetMapping("/checkVideoList/next")
+//    public Result getNextCheckVideo(HttpServletRequest request, HttpServletResponse response,@RequestParam Long len) throws Exception{
+//        return videoService.getCheckVideoList(len);
+//    }
+
+    @GetMapping("/videoInfo")
+    public Result getVideoInfo(HttpServletRequest request, HttpServletResponse response, @RequestParam Long videoId){
+        return videoService.getVideoInfo(videoId);
+    }
 
 
 
@@ -75,5 +123,45 @@ public class VideoController {
         videoService.getPicture(response,picturePath);
 
     }
+
+
+    // TODO: 2023/3/14 定期清理审核不通过的视频  将审核通过的checkVideo表留着 将审核不通过的数据库和文件都删除
+
+
+
+
+
+    @GetMapping("/list/popular")
+    public PageInfo<VideoVo> getPopularVideoList(
+            HttpServletRequest request, HttpServletResponse response
+            , @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize) {
+        return videoService.getPopularVideoList(pageNum,pageSize);
+    }
+
+
+
+    @GetMapping("/score")
+    public Result getScore(HttpServletRequest request, HttpServletResponse response, @RequestParam Long  videoId) throws Exception{
+//        return recommendService.scoreVideo(scoreVideoDto);
+        return null;
+    }
+
+
+    @PostMapping("/score")
+    public Result scoreVideo(HttpServletRequest request, HttpServletResponse response, @RequestBody ScoreVideoDto scoreVideoDto) throws Exception{
+        return recommendService.scoreVideo(scoreVideoDto);
+//        return null;
+    }
+
+
+    @GetMapping("/list/recommend")
+    public Result getVideoList(HttpServletRequest request, HttpServletResponse response) throws Exception{
+//        videoService.getVideo(request,response,videoPath);
+        return recommendService.getRecommend();
+    }
+
+
+
 
 }

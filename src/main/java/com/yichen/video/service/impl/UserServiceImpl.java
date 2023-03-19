@@ -108,15 +108,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    class UserInfo{
-        String token;
-        Integer userType;
-
-        public UserInfo(String token, Integer userType) {
-            this.token = token;
-            this.userType = userType;
-        }
-    }
 
     @Override
     public Result logOut() {
@@ -148,6 +139,7 @@ public class UserServiceImpl implements UserService {
             user.setUserLevel((byte) 0);
             user.setUserLevelPoints(0);
             user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+            user.setCreTime(System.currentTimeMillis());
 
 
             userMapper.insert(user);
