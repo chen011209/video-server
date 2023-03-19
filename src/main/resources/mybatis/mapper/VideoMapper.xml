@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichen.video.dao.VideoMapper">
+  <resultMap id="BaseResultMap" type="com.yichen.video.model.Video">
+    <id column="video_id" jdbcType="BIGINT" property="videoId" />
+    <result column="video_title" jdbcType="VARCHAR" property="videoTitle" />
+    <result column="video_introduction" jdbcType="VARCHAR" property="videoIntroduction" />
+    <result column="check_video_id" jdbcType="BIGINT" property="checkVideoId" />
+    <result column="release_time" jdbcType="BIGINT" property="releaseTime" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
+    <result column="picture_path" jdbcType="VARCHAR" property="picturePath" />
+    <result column="view_num" jdbcType="INTEGER" property="viewNum" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    video_id, video_title, video_introduction, check_video_id, release_time, user_id, 
+    video_path, picture_path, view_num
+  </sql>
+  <select id="selectByExample" parameterType="com.yichen.video.model.VideoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_video
+    where video_id = #{videoId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_video
+    where video_id = #{videoId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.yichen.video.model.VideoExample">
+    delete from t_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.yichen.video.model.Video">
+    insert into t_video (video_id, video_title, video_introduction, 
+      check_video_id, release_time, user_id, 
+      video_path, picture_path, view_num
+      )
+    values (#{videoId,jdbcType=BIGINT}, #{videoTitle,jdbcType=VARCHAR}, #{videoIntroduction,jdbcType=VARCHAR}, 
+      #{checkVideoId,jdbcType=BIGINT}, #{releaseTime,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, 
+      #{videoPath,jdbcType=VARCHAR}, #{picturePath,jdbcType=VARCHAR}, #{viewNum,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yichen.video.model.Video">
+    insert into t_video
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="videoId != null">
+        video_id,
+      </if>
+      <if test="videoTitle != null">
+        video_title,
+      </if>
+      <if test="videoIntroduction != null">
+        video_introduction,
+      </if>
+      <if test="checkVideoId != null">
+        check_video_id,
+      </if>
+      <if test="releaseTime != null">
+        release_time,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="videoPath != null">
+        video_path,
+      </if>
+      <if test="picturePath != null">
+        picture_path,
+      </if>
+      <if test="viewNum != null">
+        view_num,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="videoId != null">
+        #{videoId,jdbcType=BIGINT},
+      </if>
+      <if test="videoTitle != null">
+        #{videoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="videoIntroduction != null">
+        #{videoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="checkVideoId != null">
+        #{checkVideoId,jdbcType=BIGINT},
+      </if>
+      <if test="releaseTime != null">
+        #{releaseTime,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="videoPath != null">
+        #{videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="picturePath != null">
+        #{picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="viewNum != null">
+        #{viewNum,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="getVideoList" resultType="com.yichen.video.vo.VideoVo">
+    select video_id,picture_path,video_title,t_video.user_id,user_name,view_num
+    from t_video INNER JOIN t_user on t_video.user_id = t_user.user_id
+    order by view_num desc
+  </select>
+  <select id="getRandomVideoList" resultType="com.yichen.video.vo.VideoVo">
+    select video_id,picture_path,video_title,t_video.user_id,user_name,view_num
+    from t_video INNER JOIN t_user on t_video.user_id = t_user.user_id
+    order by view_num desc
+    limit #{start},#{end}
+  </select>
+  <select id="countByExample" parameterType="com.yichen.video.model.VideoExample" resultType="java.lang.Long">
+    select count(*) from t_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <select id="getVideoVo" resultType="com.yichen.video.vo.VideoVo">
+    select video_id,picture_path,video_title,t_video.user_id,user_name,view_num
+    from t_video INNER JOIN t_user on t_video.user_id = t_user.user_id
+    where video_id = #{videoId}
+  </select>
+
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_video
+    <set>
+      <if test="row.videoId != null">
+        video_id = #{row.videoId,jdbcType=BIGINT},
+      </if>
+      <if test="row.videoTitle != null">
+        video_title = #{row.videoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="row.videoIntroduction != null">
+        video_introduction = #{row.videoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="row.checkVideoId != null">
+        check_video_id = #{row.checkVideoId,jdbcType=BIGINT},
+      </if>
+      <if test="row.releaseTime != null">
+        release_time = #{row.releaseTime,jdbcType=BIGINT},
+      </if>
+      <if test="row.userId != null">
+        user_id = #{row.userId,jdbcType=BIGINT},
+      </if>
+      <if test="row.videoPath != null">
+        video_path = #{row.videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="row.picturePath != null">
+        picture_path = #{row.picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="row.viewNum != null">
+        view_num = #{row.viewNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_video
+    set video_id = #{row.videoId,jdbcType=BIGINT},
+      video_title = #{row.videoTitle,jdbcType=VARCHAR},
+      video_introduction = #{row.videoIntroduction,jdbcType=VARCHAR},
+      check_video_id = #{row.checkVideoId,jdbcType=BIGINT},
+      release_time = #{row.releaseTime,jdbcType=BIGINT},
+      user_id = #{row.userId,jdbcType=BIGINT},
+      video_path = #{row.videoPath,jdbcType=VARCHAR},
+      picture_path = #{row.picturePath,jdbcType=VARCHAR},
+      view_num = #{row.viewNum,jdbcType=INTEGER}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yichen.video.model.Video">
+    update t_video
+    <set>
+      <if test="videoTitle != null">
+        video_title = #{videoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="videoIntroduction != null">
+        video_introduction = #{videoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="checkVideoId != null">
+        check_video_id = #{checkVideoId,jdbcType=BIGINT},
+      </if>
+      <if test="releaseTime != null">
+        release_time = #{releaseTime,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="videoPath != null">
+        video_path = #{videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="picturePath != null">
+        picture_path = #{picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="viewNum != null">
+        view_num = #{viewNum,jdbcType=INTEGER},
+      </if>
+    </set>
+    where video_id = #{videoId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yichen.video.model.Video">
+    update t_video
+    set video_title = #{videoTitle,jdbcType=VARCHAR},
+      video_introduction = #{videoIntroduction,jdbcType=VARCHAR},
+      check_video_id = #{checkVideoId,jdbcType=BIGINT},
+      release_time = #{releaseTime,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      video_path = #{videoPath,jdbcType=VARCHAR},
+      picture_path = #{picturePath,jdbcType=VARCHAR},
+      view_num = #{viewNum,jdbcType=INTEGER}
+    where video_id = #{videoId,jdbcType=BIGINT}
+  </update>
+</mapper>

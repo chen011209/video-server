@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichen.video.dao.CheckVideoMapper">
+  <resultMap id="BaseResultMap" type="com.yichen.video.model.CheckVideo">
+    <id column="check_video_id" jdbcType="BIGINT" property="checkVideoId" />
+    <result column="check_video_title" jdbcType="VARCHAR" property="checkVideoTitle" />
+    <result column="check_video_introduction" jdbcType="VARCHAR" property="checkVideoIntroduction" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="upload_time" jdbcType="BIGINT" property="uploadTime" />
+    <result column="video_path" jdbcType="VARCHAR" property="videoPath" />
+    <result column="picture_path" jdbcType="VARCHAR" property="picturePath" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="check_time" jdbcType="BIGINT" property="checkTime" />
+    <result column="check_admin_id" jdbcType="BIGINT" property="checkAdminId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    check_video_id, check_video_title, check_video_introduction, user_id, status, upload_time, 
+    video_path, picture_path, remark, check_time, check_admin_id
+  </sql>
+  <select id="getCheckVideoList" resultType="com.yichen.video.vo.CheckVideoVo">
+      select check_video_id,picture_path,check_video_title,t_check_video.user_id,user_name
+      from t_check_video INNER JOIN t_user on t_check_video.user_id = t_user.user_id
+      where status = 0
+      order by upload_time limit #{limit}
+  </select>
+  <select id="selectByExample" parameterType="com.yichen.video.model.CheckVideoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_check_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_check_video
+    where check_video_id = #{checkVideoId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_check_video
+    where check_video_id = #{checkVideoId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.yichen.video.model.CheckVideoExample">
+    delete from t_check_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.yichen.video.model.CheckVideo">
+    insert into t_check_video (check_video_id, check_video_title, check_video_introduction, 
+      user_id, status, upload_time, 
+      video_path, picture_path, remark, 
+      check_time, check_admin_id)
+    values (#{checkVideoId,jdbcType=BIGINT}, #{checkVideoTitle,jdbcType=VARCHAR}, #{checkVideoIntroduction,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=BIGINT}, #{status,jdbcType=TINYINT}, #{uploadTime,jdbcType=BIGINT}, 
+      #{videoPath,jdbcType=VARCHAR}, #{picturePath,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{checkTime,jdbcType=BIGINT}, #{checkAdminId,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yichen.video.model.CheckVideo">
+    insert into t_check_video
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="checkVideoId != null">
+        check_video_id,
+      </if>
+      <if test="checkVideoTitle != null">
+        check_video_title,
+      </if>
+      <if test="checkVideoIntroduction != null">
+        check_video_introduction,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="uploadTime != null">
+        upload_time,
+      </if>
+      <if test="videoPath != null">
+        video_path,
+      </if>
+      <if test="picturePath != null">
+        picture_path,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="checkTime != null">
+        check_time,
+      </if>
+      <if test="checkAdminId != null">
+        check_admin_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="checkVideoId != null">
+        #{checkVideoId,jdbcType=BIGINT},
+      </if>
+      <if test="checkVideoTitle != null">
+        #{checkVideoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="checkVideoIntroduction != null">
+        #{checkVideoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=BIGINT},
+      </if>
+      <if test="videoPath != null">
+        #{videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="picturePath != null">
+        #{picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="checkTime != null">
+        #{checkTime,jdbcType=BIGINT},
+      </if>
+      <if test="checkAdminId != null">
+        #{checkAdminId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.yichen.video.model.CheckVideoExample" resultType="java.lang.Long">
+    select count(*) from t_check_video
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_check_video
+    <set>
+      <if test="row.checkVideoId != null">
+        check_video_id = #{row.checkVideoId,jdbcType=BIGINT},
+      </if>
+      <if test="row.checkVideoTitle != null">
+        check_video_title = #{row.checkVideoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="row.checkVideoIntroduction != null">
+        check_video_introduction = #{row.checkVideoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="row.userId != null">
+        user_id = #{row.userId,jdbcType=BIGINT},
+      </if>
+      <if test="row.status != null">
+        status = #{row.status,jdbcType=TINYINT},
+      </if>
+      <if test="row.uploadTime != null">
+        upload_time = #{row.uploadTime,jdbcType=BIGINT},
+      </if>
+      <if test="row.videoPath != null">
+        video_path = #{row.videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="row.picturePath != null">
+        picture_path = #{row.picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="row.remark != null">
+        remark = #{row.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="row.checkTime != null">
+        check_time = #{row.checkTime,jdbcType=BIGINT},
+      </if>
+      <if test="row.checkAdminId != null">
+        check_admin_id = #{row.checkAdminId,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_check_video
+    set check_video_id = #{row.checkVideoId,jdbcType=BIGINT},
+      check_video_title = #{row.checkVideoTitle,jdbcType=VARCHAR},
+      check_video_introduction = #{row.checkVideoIntroduction,jdbcType=VARCHAR},
+      user_id = #{row.userId,jdbcType=BIGINT},
+      status = #{row.status,jdbcType=TINYINT},
+      upload_time = #{row.uploadTime,jdbcType=BIGINT},
+      video_path = #{row.videoPath,jdbcType=VARCHAR},
+      picture_path = #{row.picturePath,jdbcType=VARCHAR},
+      remark = #{row.remark,jdbcType=VARCHAR},
+      check_time = #{row.checkTime,jdbcType=BIGINT},
+      check_admin_id = #{row.checkAdminId,jdbcType=BIGINT}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yichen.video.model.CheckVideo">
+    update t_check_video
+    <set>
+      <if test="checkVideoTitle != null">
+        check_video_title = #{checkVideoTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="checkVideoIntroduction != null">
+        check_video_introduction = #{checkVideoIntroduction,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="uploadTime != null">
+        upload_time = #{uploadTime,jdbcType=BIGINT},
+      </if>
+      <if test="videoPath != null">
+        video_path = #{videoPath,jdbcType=VARCHAR},
+      </if>
+      <if test="picturePath != null">
+        picture_path = #{picturePath,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="checkTime != null">
+        check_time = #{checkTime,jdbcType=BIGINT},
+      </if>
+      <if test="checkAdminId != null">
+        check_admin_id = #{checkAdminId,jdbcType=BIGINT},
+      </if>
+    </set>
+    where check_video_id = #{checkVideoId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yichen.video.model.CheckVideo">
+    update t_check_video
+    set check_video_title = #{checkVideoTitle,jdbcType=VARCHAR},
+      check_video_introduction = #{checkVideoIntroduction,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=BIGINT},
+      status = #{status,jdbcType=TINYINT},
+      upload_time = #{uploadTime,jdbcType=BIGINT},
+      video_path = #{videoPath,jdbcType=VARCHAR},
+      picture_path = #{picturePath,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      check_time = #{checkTime,jdbcType=BIGINT},
+      check_admin_id = #{checkAdminId,jdbcType=BIGINT}
+    where check_video_id = #{checkVideoId,jdbcType=BIGINT}
+  </update>
+</mapper>
