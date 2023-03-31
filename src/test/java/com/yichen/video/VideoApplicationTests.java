@@ -1,12 +1,16 @@
 package com.yichen.video;
 
+import com.yichen.video.dao.CommentMapper;
 import com.yichen.video.dao.ScoreMapper;
 import com.yichen.video.dao.UserMapper;
 import com.yichen.video.dao.VideoMapper;
 import com.yichen.video.enums.UserTypeEnum;
+import com.yichen.video.model.Comment;
 import com.yichen.video.model.Score;
 import com.yichen.video.model.User;
 import com.yichen.video.model.Video;
+import com.yichen.video.util.UserUtil;
+import com.yichen.video.util.sensitiveWord.SensitivewordFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -165,7 +169,7 @@ class VideoApplicationTests {
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Test
     public void insertUser(){
-        for (int i = 10; i < 1000; i++) {
+        for (int i = 1; i <= 1000; i++) {
 
 
             System.out.println(i);
@@ -194,7 +198,7 @@ class VideoApplicationTests {
         Video video = new Video();
         video.setCheckVideoId(1L);
 
-        for (int i = 0; i < 1700; i++) {
+        for (int i = 1; i < 1700; i++) {
 
             if(i%3 ==0){
                 video.setVideoTitle("(视频id:"+i+")别再用谷歌了！7分钟让你爱上Edge浏览器！");
@@ -230,6 +234,46 @@ class VideoApplicationTests {
 
 
 
+    }
+
+
+    @Autowired
+    CommentMapper commentMapper;
+    @Test
+    public void insertComment(){
+
+        for (int i = 333; i < 555; i++) {
+            Comment comment = new Comment();
+            comment.setContent(String.valueOf(i));
+            comment.setLikes(0);
+            comment.setTime(System.currentTimeMillis());
+            comment.setVideoId(98L);
+            comment.setUserId(1L);
+            commentMapper.insert(comment);
+        }
+
+    }
+
+    @Autowired
+    SensitivewordFilter filter;
+    @Test
+    public void testSensitive(){
+//        SensitivewordFilter filter = new SensitivewordFilter();
+//        System.out.println("敏感词的数量：" + filter.sensitiveWordMap.size());
+
+        String string = "支持西藏独立太多的伤感sb情怀也许只局限于饲养基地 荧幕中的情节。"
+                + "然后 我们的扮演的角色就是跟随着主人公的喜红客联盟 怒哀乐而过于牵强的把自己的情感也附加于银幕情节中，然后感动就流泪，"
+                + "难过就躺在某一个人的怀里尽情的阐述心扉或者手机卡复制器一个贱人一杯红酒一部电影在夜 深人静的晚上，关上电话静静的发呆着。西藏独立";
+        System.out.println("待检测语句字数：" + string.length());
+
+        long beginTime = System.currentTimeMillis();
+//        Set<String> set = filter.getSensitiveWord(string, 1);
+        String txt=filter.replaceSensitiveWord(string,1,"*");
+        long endTime = System.currentTimeMillis();
+
+//        System.out.println("语句中包含敏感词的个数为：" + set.size() + "。包含：" + set);
+        System.out.println(txt);
+        System.out.println("总共消耗时间为：" + (endTime - beginTime));
     }
 
 }

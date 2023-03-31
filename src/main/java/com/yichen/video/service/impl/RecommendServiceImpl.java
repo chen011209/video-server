@@ -2,13 +2,17 @@ package com.yichen.video.service.impl;
 
 import com.yichen.video.aligorithum.Neighbor;
 import com.yichen.video.aligorithum.item;
+import com.yichen.video.dao.CollectMapper;
 import com.yichen.video.dao.ScoreMapper;
 import com.yichen.video.dao.VideoMapper;
+import com.yichen.video.dto.CollectDto;
 import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.model.*;
 import com.yichen.video.security.LoginUser;
 import com.yichen.video.service.RecommendService;
+import com.yichen.video.util.UserUtil;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.UserVideoVo;
 import com.yichen.video.vo.VideoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -27,6 +31,11 @@ public class RecommendServiceImpl implements RecommendService {
 
     @Autowired
     VideoMapper videoMapper;
+
+    @Autowired
+    CollectMapper collectMapper;
+
+
 
     public static final int USERSIZE=943;
     public static final int ITEMSIZE=1682;
@@ -52,7 +61,7 @@ public class RecommendServiceImpl implements RecommendService {
 
             //随机推荐popular榜上的视频
             int i = (int) (Math.random() * 5 );
-            List<VideoVo> videoVoList = videoMapper.getRandomVideoList(i * 10,10);
+            List<VideoVo> videoVoList = videoMapper.getRandomVideoList(i * 10,17);
 
 
             for(VideoVo videoVo:videoVoList){
@@ -196,9 +205,9 @@ public class RecommendServiceImpl implements RecommendService {
         }
 
 
-        for(int i=1;i<=UN;i++){
-            System.out.println(NofUser[i].getID()+":"+NofUser[i].getValue());
-        }
+//        for(int i=1;i<=UN;i++){
+//            System.out.println(NofUser[i].getID()+":"+NofUser[i].getValue());
+//        }
 
         List<item> itemList = new ArrayList<>();
         //遍历出所有 最近邻访问过的视频 并剔除自己访问过的
@@ -229,13 +238,13 @@ public class RecommendServiceImpl implements RecommendService {
         });
 
 
-        HashSet<Integer> hashSet = new HashSet<>(10);
-        for (int i = 0; i < 10; i++) {
+        HashSet<Integer> hashSet = new HashSet<>(17);
+        for (int i = 0; i < 17; i++) {
             hashSet.add(itemList.get(i).id);
 //            System.out.println("virtualID:"+itemList.get(i).id);
         }
 
-        List<Long> result = new ArrayList<>(10);
+        List<Long> result = new ArrayList<>(17);
 
         Stack<Integer> stack = new Stack<Integer>();
 
@@ -275,6 +284,12 @@ public class RecommendServiceImpl implements RecommendService {
 
         System.out.println(System.currentTimeMillis() - s1);
 
+
+        for(VideoVo videoVo:videoList){
+            videoVo.setPicturePath("http://127.0.0.1:8080/video/picture?picturePath="+videoVo.getPicturePath().replace('\\','/'));
+
+        }
+
         return Result.ok(videoList);
     }
 
@@ -286,16 +301,31 @@ public class RecommendServiceImpl implements RecommendService {
         Long userid = user.getUserId();
 
 
+        ScoreExample scoreExample = new ScoreExample();
+        scoreExample.createCriteria()
+                .andUserIdEqualTo(userid)
+                .andVideoIdEqualTo(scoreVideoDto.getVideoId());
+
+        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
+
+
         Score score = new Score();
         score.setScore(scoreVideoDto.getScore().byteValue());
         score.setUserId(userid);
         score.setVideoId(scoreVideoDto.getVideoId());
         score.setScoreTime(System.currentTimeMillis());
 
-
-        scoreMapper.insert(score);
+        if(scoreList.size()==0){
+            scoreMapper.insert(score);
+        }else {
+            score.setScoreId(scoreList.get(0).getScoreId());
+            scoreMapper.updateByPrimaryKey(score);
+        }
         return Result.ok();
+
     }
+
+
 
     //Chapter2：聚类，找和某一用户有相同喜好的一类用户
     //2-1：:Pearson计算向量的相似度
@@ -342,6 +372,59 @@ public class RecommendServiceImpl implements RecommendService {
         }
         return average[userID]+sum1/sum2;
     }
+
+
+
+    @Override
+    public Result getScore(Long videoId) {
+        ScoreExample scoreExample = new ScoreExample();
+        scoreExample.createCriteria()
+                .andVideoIdEqualTo(videoId)
+                .andUserIdEqualTo(UserUtil.getUserId());
+
+        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
+
+        if(scoreList.size()!=0){
+            return Result.ok(scoreList.get(0));
+        }else {
+            return Result.ok();
+        }
+
+    }
+
+    @Override
+    public Result getIndividualInfo(Long videoId) {
+        UserVideoVo userVideoVo = new UserVideoVo();
+
+        Long userId = UserUtil.getUserId();
+
+        ScoreExample scoreExample = new ScoreExample();
+        scoreExample.createCriteria()
+                .andVideoIdEqualTo(videoId)
+                .andUserIdEqualTo(userId);
+
+        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
+
+        if(scoreList.size()!=0){
+            userVideoVo.setScore(scoreList.get(0).getScore());
+        }
+
+
+        CollectExample collectExample = new CollectExample();
+        collectExample.createCriteria()
+                .andVideoIdEqualTo(videoId)
+                .andUserIdEqualTo(userId);
+
+        List<Collect> collectList = collectMapper.selectByExample(collectExample);
+
+        if(collectList.size()!=0){
+            userVideoVo.setIsCollect(true);
+        }
+
+        return Result.ok(userVideoVo);
+    }
+
+
 }
 
 

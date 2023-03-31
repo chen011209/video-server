@@ -1,81 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>CSS设置文字换行示例</title>
+    <style>
+        .box {
+            width: 400px;
+            height: 200px;
+            border: 1px solid #ccc;
+            overflow-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
-
-    <video controls autoplay src="http://127.0.0.1:8080/video/video?videoPath=D:/bishe/video-repository/video/39/1678696239153.mp4"
-           style="width: 50%" height="50%"/>
-
-<div class="container-1">
-
-    <div class="container-2">
-        First name: <input type="text" name="fname" />
-        Last name: <input type="text" name="lname" />
-    </div>
-
-    <div class="container-2">
-        First name: <input type="text" name="fname" />
-        Last name: <input type="text" name="lname" />
-    </div>
-
-<!--    <div id="a">1234</div>   -->
-<!--    -->
-<!--    <div id="b">1234</div>-->
-
-
-
-
+<div class="box">
+    <p>这段文本中包含了一些很长很长的单词，如果不进行换行处理，超出容器的部分可能会被截断或者溢出，影响页面的美观。但是通过设置overflow-wrap: break-word，就可以在单词中的断点处进行换行了。</p>
 </div>
-
-
-<!--<div id = "c">312</div>-->
-
-
-
 </body>
 </html>
-
-<style>
-
-
-    .container-1{
-        display: flex;
-        flex-direction: column;
-        gap: 100px
-    ;
-    }
-
-
-
-    .container-2{
-        display: flex;
-        gap: 100px
-    ;
-    }
-
-    #a{
-        width: 100px;
-        height: 100px;
-        background-color: red;
-    }
-
-    #b{
-        width: 100px;
-        height: 100px;
-        background-color: #00ff2a;
-
-    }
-
-    /*#c{*/
-    /*    width: 100px;*/
-    /*    height: 100px;*/
-    /*    background-color: #00ccff;*/
-
-    /*    display: block;*/
-
-    /*}*/
-
-</style>

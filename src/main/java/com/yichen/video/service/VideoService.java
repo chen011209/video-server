@@ -2,6 +2,7 @@ package com.yichen.video.service;
 
 import com.github.pagehelper.PageInfo;
 import com.yichen.video.dto.CheckVideoDto;
+import com.yichen.video.dto.CollectDto;
 import com.yichen.video.dto.UploadDto;
 import com.yichen.video.model.Comment;
 import com.yichen.video.vo.Result;
@@ -38,5 +39,15 @@ public interface VideoService {
 
 
     PageInfo<VideoVo> getPopularVideoList(int pageNum, int pageSize);
+
+    Result collectVideo(CollectDto collectDto);
+
+    PageInfo<VideoVo> getCollectList(int pageNum, int pageSize);
+
+    PageInfo<VideoVo> getHistoryList(int pageNum, int pageSize);
+
+    PageInfo<VideoVo> getSearchList(int pageNum, int pageSize,String content);
+
+
 
 }

@@ -11,6 +11,8 @@ public class Comment {
 
     private Integer likes;
 
+    private Long userId;
+
     public Long getCommentId() {
         return commentId;
     }
@@ -49,5 +51,13 @@ public class Comment {
 
     public void setLikes(Integer likes) {
         this.likes = likes;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

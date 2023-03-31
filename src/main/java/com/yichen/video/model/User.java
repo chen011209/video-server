@@ -19,6 +19,8 @@ public class User {
 
     private Long creTime;
 
+    private String avatarPath;
+
     public Long getUserId() {
         return userId;
     }
@@ -89,5 +91,13 @@ public class User {
 
     public void setCreTime(Long creTime) {
         this.creTime = creTime;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath == null ? null : avatarPath.trim();
     }
 }

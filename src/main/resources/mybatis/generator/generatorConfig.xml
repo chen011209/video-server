@@ -48,6 +48,10 @@
 
 
         <!-- 数据表进行生成操作 schema:相当于库名; tableName:表名; domainObjectName:对应的DO -->
+        <table schema="${schema}" tableName="t_comment_like" domainObjectName="CommentLike">
+        </table>
+<!--                <table schema="${schema}" tableName="t_collect" domainObjectName="Collect">-->
+<!--                </table>-->
 <!--        <table schema="${schema}" tableName="t_comment" domainObjectName="Comment">-->
 <!--        </table>-->
 <!--        <table schema="${schema}" tableName="t_video" domainObjectName="Video">-->
@@ -57,8 +61,8 @@
 <!--        <table schema="${schema}" tableName="t_admin" domainObjectName="Admin">-->
 <!--        </table>-->
 
-                <table schema="${schema}" tableName="t_score" domainObjectName="Score">
-                </table>
+<!--                <table schema="${schema}" tableName="t_score" domainObjectName="Score">-->
+<!--                </table>-->
 
     </context>
 </generatorConfiguration>

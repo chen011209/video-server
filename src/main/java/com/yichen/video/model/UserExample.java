@@ -683,6 +683,76 @@ public class UserExample {
             addCriterion("cre_time not between", value1, value2, "creTime");
             return (Criteria) this;
         }
+
+        public Criteria andAvatarPathIsNull() {
+            addCriterion("avatar_path is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathIsNotNull() {
+            addCriterion("avatar_path is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathEqualTo(String value) {
+            addCriterion("avatar_path =", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathNotEqualTo(String value) {
+            addCriterion("avatar_path <>", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathGreaterThan(String value) {
+            addCriterion("avatar_path >", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathGreaterThanOrEqualTo(String value) {
+            addCriterion("avatar_path >=", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathLessThan(String value) {
+            addCriterion("avatar_path <", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathLessThanOrEqualTo(String value) {
+            addCriterion("avatar_path <=", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathLike(String value) {
+            addCriterion("avatar_path like", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathNotLike(String value) {
+            addCriterion("avatar_path not like", value, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathIn(List<String> values) {
+            addCriterion("avatar_path in", values, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathNotIn(List<String> values) {
+            addCriterion("avatar_path not in", values, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathBetween(String value1, String value2) {
+            addCriterion("avatar_path between", value1, value2, "avatarPath");
+            return (Criteria) this;
+        }
+
+        public Criteria andAvatarPathNotBetween(String value1, String value2) {
+            addCriterion("avatar_path not between", value1, value2, "avatarPath");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

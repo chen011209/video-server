@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/register").anonymous()
                 .antMatchers("/video/picture").anonymous()
                 .antMatchers("/video/video").anonymous()
-//                .antMatchers("/user/logout").authenticated();
+                .antMatchers("/user/sendEmail").anonymous()
 //                .antMatchers("/video/uploadfile").anonymous()
 //                .antMatchers("/waterSet/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证

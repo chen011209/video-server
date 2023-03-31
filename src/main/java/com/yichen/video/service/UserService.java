@@ -1,5 +1,7 @@
 package com.yichen.video.service;
 
+import com.yichen.video.dto.AvatarDto;
+import com.yichen.video.dto.EditDto;
 import com.yichen.video.dto.LoginDto;
 import com.yichen.video.dto.RegisterDto;
 import com.yichen.video.vo.Result;
@@ -15,8 +17,16 @@ public interface UserService {
 
     Result register(RegisterDto registerDto);
 
+    void getAvatar(HttpServletResponse response,String avatarPath);
+
+    Result editUser(EditDto editDto);
 
 
+    Result editAvatar(AvatarDto avatarDto);
 
-    void getUser();
+    Result getUserInfo(Long userId);
+
+    Result sendMail(String emailReceiver);
+
+
 }

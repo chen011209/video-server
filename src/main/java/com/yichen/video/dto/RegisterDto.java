@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class RegisterDto {
     private String userName;
 
+    private String verificationCode;
+
     private Byte userLevel;
 
     private Integer userLevelPoints;

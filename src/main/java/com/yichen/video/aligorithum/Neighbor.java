@@ -1,8 +1,8 @@
 package com.yichen.video.aligorithum;
 
 public class Neighbor implements Comparable{
-	private int id;//邻居的编号
-	private double value;//与邻居的相似度
+	private int id;
+	private double value;
 	public Neighbor(int id, double value) {
 		this.id=id;
 		this.value=value;
@@ -15,7 +15,7 @@ public class Neighbor implements Comparable{
 	}
 	
 	
-	public int compareTo(Object o) {//覆写方法，是对象按照value降序排列
+	public int compareTo(Object o) {
 		// TODO Auto-generated method stub
 		if(o instanceof Neighbor){
 			Integer ID=((Neighbor) o).id;

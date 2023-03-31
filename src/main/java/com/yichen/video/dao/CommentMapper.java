@@ -9,6 +9,15 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface CommentMapper {
+    /**
+     * myCode
+     * @param example
+     * @return
+     */
+
+    void likeComment(Long videoId);
+
+
     long countByExample(CommentExample example);
 
     int deleteByExample(CommentExample example);

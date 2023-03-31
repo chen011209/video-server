@@ -290,4 +290,9 @@
       view_num = #{viewNum,jdbcType=INTEGER}
     where video_id = #{videoId,jdbcType=BIGINT}
   </update>
+    <update id="increaseViewNum">
+      update t_video
+      set  view_num = view_num + 1
+      where video_id = #{videoId,jdbcType=BIGINT}
+    </update>
 </mapper>

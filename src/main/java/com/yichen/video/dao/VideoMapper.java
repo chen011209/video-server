@@ -19,6 +19,9 @@ myCode
 
     VideoVo getVideoVo(Long videoId);
 
+
+    void increaseViewNum(Long videoId);
+
     long countByExample(VideoExample example);
 
     int deleteByExample(VideoExample example);

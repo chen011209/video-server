@@ -3,6 +3,7 @@ package com.yichen.video.controller;
 import com.github.pagehelper.PageInfo;
 import com.sun.org.apache.bcel.internal.classfile.Code;
 import com.yichen.video.dto.CheckVideoDto;
+import com.yichen.video.dto.CollectDto;
 import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.dto.UploadDto;
 import com.yichen.video.model.Comment;
@@ -126,11 +127,6 @@ public class VideoController {
 
 
     // TODO: 2023/3/14 定期清理审核不通过的视频  将审核通过的checkVideo表留着 将审核不通过的数据库和文件都删除
-
-
-
-
-
     @GetMapping("/list/popular")
     public PageInfo<VideoVo> getPopularVideoList(
             HttpServletRequest request, HttpServletResponse response
@@ -143,10 +139,16 @@ public class VideoController {
 
     @GetMapping("/score")
     public Result getScore(HttpServletRequest request, HttpServletResponse response, @RequestParam Long  videoId) throws Exception{
-//        return recommendService.scoreVideo(scoreVideoDto);
-        return null;
+        return recommendService.getScore(videoId);
+//        return null;
     }
 
+
+    @GetMapping("/user/info")
+    public Result getIndividualInfo(HttpServletRequest request, HttpServletResponse response, @RequestParam Long  videoId) throws Exception{
+        return recommendService.getIndividualInfo(videoId);
+//        return null;
+    }
 
     @PostMapping("/score")
     public Result scoreVideo(HttpServletRequest request, HttpServletResponse response, @RequestBody ScoreVideoDto scoreVideoDto) throws Exception{
@@ -163,5 +165,29 @@ public class VideoController {
 
 
 
+    @PostMapping("/collect")
+    public Result collectVideo(HttpServletRequest request, HttpServletResponse response,@RequestBody CollectDto collectDto) throws Exception{
+//        videoService.getVideo(request,response,videoPath);
+        return videoService.collectVideo(collectDto);
+    }
 
+    @GetMapping("/collect")
+    public PageInfo<VideoVo> getCollectList(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize){
+        return videoService.getCollectList(pageNum,pageSize);
+
+    }
+
+    @GetMapping("/history")
+    public PageInfo<VideoVo> getHistoryList(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize){
+        return videoService.getHistoryList(pageNum,pageSize);
+
+    }
+
+    @GetMapping("/search")
+    public PageInfo<VideoVo> searchVideo(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize,@RequestParam  String content){
+        return videoService.getSearchList(pageNum,pageSize,content);
+    }
 }
