@@ -587,5 +587,99 @@ public class VideoServiceImpl implements VideoService {
 		return result;
 	}
 
+	@Override
+	public PageInfo<VideoVo> getVideoList(int pageNum, int pageSize, Long userId) {
+		PageHelper.startPage(pageNum, pageSize);
+
+
+		VideoExample videoExample = new VideoExample();
+		videoExample.createCriteria()
+				.andUserIdEqualTo(userId);
+
+
+		List<Video> videoList = videoMapper.selectByExample(videoExample);
+
+
+
+		List<VideoVo> videoVoList = new ArrayList<>(videoList.size());
+
+		PageInfo result = new PageInfo<>(videoList);
+
+
+
+
+		for (Video video : videoList) {
+
+			VideoVo videoVo = new VideoVo();
+
+			try {
+				BeanUtils.copyProperties(videoVo, video);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+
+
+			videoVo.setPicturePath(FileUtil.getPicturePath(videoVo.getPicturePath()));
+
+			videoVoList.add(videoVo);
+
+		}
+
+
+		result.setList(videoVoList);
+
+		return result;
+	}
+
+	@Override
+	public PageInfo<VideoVo> getUserVideoList(int pageNum, int pageSize) {
+
+		PageHelper.startPage(pageNum, pageSize);
+
+
+		VideoExample videoExample = new VideoExample();
+		videoExample.createCriteria()
+				.andUserIdEqualTo(UserUtil.getUserId());
+
+
+		List<Video> videoList = videoMapper.selectByExample(videoExample);
+
+
+
+		List<VideoVo> videoVoList = new ArrayList<>(videoList.size());
+
+		PageInfo result = new PageInfo<>(videoList);
+
+
+
+
+		for (Video video : videoList) {
+
+			VideoVo videoVo = new VideoVo();
+
+			try {
+				BeanUtils.copyProperties(videoVo, video);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+
+
+			videoVo.setPicturePath(FileUtil.getPicturePath(videoVo.getPicturePath()));
+
+			videoVoList.add(videoVo);
+
+		}
+
+
+		result.setList(videoVoList);
+
+		return result;
+
+	}
+
 
 }

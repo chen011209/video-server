@@ -1,7 +1,10 @@
 package com.yichen.video.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.yichen.video.Redis.RedisCache;
+import com.yichen.video.dao.FollowMapper;
 import com.yichen.video.dao.UserMapper;
 import com.yichen.video.dto.AvatarDto;
 import com.yichen.video.dto.EditDto;
@@ -9,6 +12,8 @@ import com.yichen.video.dto.LoginDto;
 import com.yichen.video.dto.RegisterDto;
 import com.yichen.video.enums.ErrorEnum;
 import com.yichen.video.enums.UserTypeEnum;
+import com.yichen.video.model.Follow;
+import com.yichen.video.model.FollowExample;
 import com.yichen.video.model.User;
 import com.yichen.video.model.UserExample;
 import com.yichen.video.service.UserService;
@@ -35,7 +40,10 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.SocketImpl;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -58,6 +66,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    FollowMapper followMapper;
 
     @Resource
     private JavaMailSender javaMailSender;
@@ -109,11 +120,13 @@ public class UserServiceImpl implements UserService {
         //使用userid生成token
         LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
         String userId = loginUser.getUser().getUserId().toString();
-        String jwt = JwtUtil.createJWT(userId);
+
+        //设置一天过期
+        String jwt = JwtUtil.createJWT(userId,86400000L);
 
 
         String preFix = null;
-        //authenticate存入redis   3天后后用户到期
+        //authenticate存入redis
         if(loginUser.getUser().getType()== UserTypeEnum.USER.getCode().byteValue()){
             preFix = "user:";
         }else if(loginUser.getUser().getType()== UserTypeEnum.ADMIN.getCode().byteValue()){
@@ -275,8 +288,8 @@ public class UserServiceImpl implements UserService {
         return Result.ok("http://127.0.0.1:8080/video/picture?picturePath="+pictureSavePth.replace('\\','/'));
     }
 
-    @Override
-    public Result getUserInfo(Long userId) {
+
+    public  UserVo getUserVo(Long userId){
         User user = userMapper.selectByPrimaryKey(userId);
 
         //将实体类转为VO
@@ -298,6 +311,23 @@ public class UserServiceImpl implements UserService {
             userVo.setSignature("这个用户很懒，还没有签名。");
         }
 
+
+        FollowExample followExample = new FollowExample();
+        followExample.createCriteria()
+                .andUserIdEqualTo(UserUtil.getUserId())
+                .andFollowUserIdEqualTo(userId);
+
+
+
+
+        if(followMapper.selectByExample(followExample).size()!=0){
+            userVo.setIsFollow(true);
+        }else  {
+            userVo.setIsFollow(false);
+        }
+
+
+
         if(userVo.getUserLevel()==7){
             userVo.setMaxLevelPoints(1);
             userVo.setUserLevelPoints(1);
@@ -305,7 +335,12 @@ public class UserServiceImpl implements UserService {
             userVo.setMaxLevelPoints(UserUtil.getMaxLevelPoints(Integer.valueOf(userVo.getUserLevel())));
         }
 
-        return Result.ok(userVo);
+        return userVo;
+    }
+
+    @Override
+    public Result getUserInfo(Long userId) {
+        return Result.ok(getUserVo(userId));
     }
 
     @Override
@@ -339,6 +374,44 @@ public class UserServiceImpl implements UserService {
         }
         return Result.fail(ErrorEnum.MAIL_ERROR.getCode(),"发送失败");
 
+    }
+
+    @Override
+    public Result followUser(Long userId) {
+
+
+        Follow follow = new Follow();
+        follow.setFollowTime(System.currentTimeMillis());
+        follow.setUserId(UserUtil.getUserId());
+        follow.setFollowUserId(userId);
+        followMapper.insert(follow);
+
+
+        return Result.ok();
+    }
+
+    @Override
+    public PageInfo<UserVo> followList(int pageNum, int pageSize) {
+        PageHelper.startPage(pageNum, pageSize);
+
+
+        FollowExample followExample = new FollowExample();
+        followExample.createCriteria()
+                .andUserIdEqualTo(UserUtil.getUserId());
+        List<Follow> followList = followMapper.selectByExample(followExample);
+
+
+        //返回的list和查询的list不同时使用
+        PageInfo result = new PageInfo<>(followList);
+
+        List<UserVo> userVoList = new ArrayList<>(followList.size());
+        for(Follow follow:followList){
+            userVoList.add(getUserVo(follow.getFollowUserId()));
+        }
+
+        result.setList(userVoList);
+
+        return result;
     }
 
 

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yichen.video.dao.FollowMapper">
+  <resultMap id="BaseResultMap" type="com.yichen.video.model.Follow">
+    <id column="follow_id" jdbcType="BIGINT" property="followId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="follow_user_id" jdbcType="BIGINT" property="followUserId" />
+    <result column="follow_time" jdbcType="BIGINT" property="followTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    follow_id, user_id, follow_user_id, follow_time
+  </sql>
+  <select id="selectByExample" parameterType="com.yichen.video.model.FollowExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_follow
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_follow
+    where follow_id = #{followId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_follow
+    where follow_id = #{followId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.yichen.video.model.FollowExample">
+    delete from t_follow
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.yichen.video.model.Follow">
+    insert into t_follow (follow_id, user_id, follow_user_id, 
+      follow_time)
+    values (#{followId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{followUserId,jdbcType=BIGINT}, 
+      #{followTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yichen.video.model.Follow">
+    insert into t_follow
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="followId != null">
+        follow_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="followUserId != null">
+        follow_user_id,
+      </if>
+      <if test="followTime != null">
+        follow_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="followId != null">
+        #{followId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="followUserId != null">
+        #{followUserId,jdbcType=BIGINT},
+      </if>
+      <if test="followTime != null">
+        #{followTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.yichen.video.model.FollowExample" resultType="java.lang.Long">
+    select count(*) from t_follow
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update t_follow
+    <set>
+      <if test="row.followId != null">
+        follow_id = #{row.followId,jdbcType=BIGINT},
+      </if>
+      <if test="row.userId != null">
+        user_id = #{row.userId,jdbcType=BIGINT},
+      </if>
+      <if test="row.followUserId != null">
+        follow_user_id = #{row.followUserId,jdbcType=BIGINT},
+      </if>
+      <if test="row.followTime != null">
+        follow_time = #{row.followTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update t_follow
+    set follow_id = #{row.followId,jdbcType=BIGINT},
+      user_id = #{row.userId,jdbcType=BIGINT},
+      follow_user_id = #{row.followUserId,jdbcType=BIGINT},
+      follow_time = #{row.followTime,jdbcType=BIGINT}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yichen.video.model.Follow">
+    update t_follow
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="followUserId != null">
+        follow_user_id = #{followUserId,jdbcType=BIGINT},
+      </if>
+      <if test="followTime != null">
+        follow_time = #{followTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where follow_id = #{followId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yichen.video.model.Follow">
+    update t_follow
+    set user_id = #{userId,jdbcType=BIGINT},
+      follow_user_id = #{followUserId,jdbcType=BIGINT},
+      follow_time = #{followTime,jdbcType=BIGINT}
+    where follow_id = #{followId,jdbcType=BIGINT}
+  </update>
+</mapper>

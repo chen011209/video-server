@@ -1,4 +1,4 @@
-package com.yichen.video.aligorithum;
+package com.yichen.video.model;
 
 public class Neighbor implements Comparable{
 	private int id;

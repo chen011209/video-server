@@ -1,11 +1,10 @@
 package com.yichen.video.service.impl;
 
-import com.yichen.video.aligorithum.Neighbor;
-import com.yichen.video.aligorithum.item;
+import com.yichen.video.model.Neighbor;
+import com.yichen.video.model.item;
 import com.yichen.video.dao.CollectMapper;
 import com.yichen.video.dao.ScoreMapper;
 import com.yichen.video.dao.VideoMapper;
-import com.yichen.video.dto.CollectDto;
 import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.model.*;
 import com.yichen.video.security.LoginUser;

@@ -1,4 +1,4 @@
-package com.yichen.video.aligorithum;
+package com.yichen.video.model;
 
 public class item {
     public int id;

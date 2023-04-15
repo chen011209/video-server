@@ -48,7 +48,7 @@
 
 
         <!-- 数据表进行生成操作 schema:相当于库名; tableName:表名; domainObjectName:对应的DO -->
-        <table schema="${schema}" tableName="t_comment_like" domainObjectName="CommentLike">
+        <table schema="${schema}" tableName="t_follow" domainObjectName="Follow">
         </table>
 <!--                <table schema="${schema}" tableName="t_collect" domainObjectName="Collect">-->
 <!--                </table>-->

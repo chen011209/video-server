@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 //开启权限功能
 @Configuration
-@CrossOrigin
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 

@@ -1,14 +1,8 @@
 package com.yichen.video;
 
-import com.yichen.video.dao.CommentMapper;
-import com.yichen.video.dao.ScoreMapper;
-import com.yichen.video.dao.UserMapper;
-import com.yichen.video.dao.VideoMapper;
+import com.yichen.video.dao.*;
 import com.yichen.video.enums.UserTypeEnum;
-import com.yichen.video.model.Comment;
-import com.yichen.video.model.Score;
-import com.yichen.video.model.User;
-import com.yichen.video.model.Video;
+import com.yichen.video.model.*;
 import com.yichen.video.util.UserUtil;
 import com.yichen.video.util.sensitiveWord.SensitivewordFilter;
 import org.junit.jupiter.api.Test;
@@ -274,6 +268,20 @@ class VideoApplicationTests {
 //        System.out.println("语句中包含敏感词的个数为：" + set.size() + "。包含：" + set);
         System.out.println(txt);
         System.out.println("总共消耗时间为：" + (endTime - beginTime));
+    }
+    
+    
+    @Autowired
+    FollowMapper followMapper;
+    @Test
+    public void addFollow(){
+        Follow follow = new Follow();
+        follow.setUserId(1L);
+        for (int i = 0; i < 100; i++) {
+            follow.setFollowUserId(Long.parseLong(String.valueOf(i)));
+            follow.setFollowTime(System.currentTimeMillis());
+            followMapper.insert(follow);
+        }
     }
 
 }

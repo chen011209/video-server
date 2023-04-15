@@ -49,5 +49,9 @@ public interface VideoService {
     PageInfo<VideoVo> getSearchList(int pageNum, int pageSize,String content);
 
 
+    PageInfo<VideoVo> getVideoList(int pageNum, int pageSize,Long userId);
+
+    PageInfo<VideoVo> getUserVideoList(int pageNum, int pageSize);
+
 
 }

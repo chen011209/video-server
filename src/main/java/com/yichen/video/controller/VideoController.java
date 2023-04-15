@@ -190,4 +190,26 @@ public class VideoController {
             , @RequestParam(defaultValue = "10") int pageSize,@RequestParam  String content){
         return videoService.getSearchList(pageNum,pageSize,content);
     }
+
+    /**
+     * 获取用户上传的视频
+     * @param request
+     * @param response
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/list/my")
+    public PageInfo<VideoVo> getUserVideoList(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize){
+        return videoService.getUserVideoList(pageNum,pageSize);
+    }
+
+
+    @GetMapping("/list")
+    public PageInfo<VideoVo> getVideoList(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize
+    ,@RequestParam Long userId){
+        return videoService.getVideoList(pageNum,pageSize,userId);
+    }
 }

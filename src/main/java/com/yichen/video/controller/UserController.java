@@ -1,6 +1,7 @@
 package com.yichen.video.controller;
 
 
+import com.github.pagehelper.PageInfo;
 import com.yichen.video.Redis.RedisCache;
 import com.yichen.video.dao.UserMapper;
 import com.yichen.video.dto.AvatarDto;
@@ -12,6 +13,8 @@ import com.yichen.video.enums.UserTypeEnum;
 import com.yichen.video.service.UserService;
 import com.yichen.video.util.UserUtil;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.UserVo;
+import com.yichen.video.vo.VideoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,12 +31,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+
 
 @RestController
 @RequestMapping("/user")
@@ -105,7 +103,7 @@ public class UserController {
 
 
     @PostMapping("/sendEmail")
-    public Result sendMail(@RequestParam(value = "emailReceiver") String emailReceiver) {
+    public Result sendMail(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "emailReceiver") String emailReceiver) {
         return  userService.sendMail(emailReceiver);
     }
 
@@ -142,6 +140,23 @@ public class UserController {
 
 
 
+    }
+
+
+
+
+
+    @PostMapping("/follow/{userId}")
+    public Result followUser(HttpServletRequest request, HttpServletResponse response, @PathVariable Long userId) {
+        return  userService.followUser(userId);
+    }
+
+
+
+    @GetMapping("/follow")
+    public PageInfo<UserVo> followList(HttpServletRequest request, HttpServletResponse response , @RequestParam(defaultValue = "1") int pageNum
+            , @RequestParam(defaultValue = "10") int pageSize) {
+        return  userService.followList(pageNum,pageSize);
     }
 
 
