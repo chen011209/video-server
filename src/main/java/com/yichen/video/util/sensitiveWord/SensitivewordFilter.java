@@ -17,7 +17,6 @@ public class SensitivewordFilter {
 
     private Map sensitiveWordMap = null;
     public static int minMatchTYpe = 1;      //最小匹配规则,查询到敏感词就返回
-    public static int maxMatchType = 2;      //最大匹配规则
 
     /**
      * 构造函数，初始化敏感词库

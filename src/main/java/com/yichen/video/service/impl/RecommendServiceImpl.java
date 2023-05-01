@@ -5,13 +5,10 @@ import com.yichen.video.model.item;
 import com.yichen.video.dao.CollectMapper;
 import com.yichen.video.dao.ScoreMapper;
 import com.yichen.video.dao.VideoMapper;
-import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.model.*;
 import com.yichen.video.security.LoginUser;
 import com.yichen.video.service.RecommendService;
-import com.yichen.video.util.UserUtil;
 import com.yichen.video.vo.Result;
-import com.yichen.video.vo.UserVideoVo;
 import com.yichen.video.vo.VideoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -34,10 +31,11 @@ public class RecommendServiceImpl implements RecommendService {
     @Autowired
     CollectMapper collectMapper;
 
+    //热门推荐和算法推荐的分界线
+    private static final int recommendDivideLine = 5;
 
-
-    public static final int USERSIZE=943;
-    public static final int ITEMSIZE=1682;
+    //定义最近邻为10
+    private static final int NEIGHBORS = 10;
 
 
     @Override
@@ -46,15 +44,14 @@ public class RecommendServiceImpl implements RecommendService {
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         User user = loginUser.getUser();
         Long userid = user.getUserId();
-
-
+        
         //返回热门列表 --start
         ScoreExample idExample = new ScoreExample();
         idExample.createCriteria().andUserIdEqualTo(userid);
         List<Score> userScoreList = scoreMapper.selectByExample(idExample);
 
         //当用户评分量太少的时候视为新用户,返回热门的视频
-        if(userScoreList.size() <=5){
+        if(userScoreList.size() <= recommendDivideLine){
 
             System.out.println("less");
 
@@ -73,13 +70,20 @@ public class RecommendServiceImpl implements RecommendService {
 
 
         //开始使用基于用户的过滤算法进行推荐
-
-        Long s1 = System.currentTimeMillis();
+        Long startTime = System.currentTimeMillis();
 
         //获取所有的scoreList
         ScoreExample scoreExample = new ScoreExample();
         List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
 
+
+        /**
+         * 需要将数据库中的用户和视频信息都传入
+         * 之后放入map中
+         * 使用真实的id作为map的Long参数
+         * 使用虚拟id作为数组的下标进行运算
+         * 在运算结束后使用虚拟id在map中找出真实的id
+         */
 
         HashMap<Long,Integer> userMap = new HashMap<>();
         HashMap<Long,Integer> videoMap = new HashMap<>();
@@ -97,33 +101,28 @@ public class RecommendServiceImpl implements RecommendService {
             }
 
         }
-//
-//
+
         int USERSIZE=userMap.size();
-        int ITEMSIZE=videoMap.size();
-        int UN=10;        //某一user的最近邻居数
+        int VIDEOSIZE=videoMap.size();
 
 
         int [] num=new int[USERSIZE+1];//每个用户为几部评了分
         double[] average=new double[USERSIZE+1];//每个user的平均打分
-        double[][] rate=new double[USERSIZE+1][ITEMSIZE+1];//评分矩阵
-        double[][] DealedOfRate=new double[USERSIZE+1][ITEMSIZE+1];//针对稀疏问题处理后的评分矩阵
+        double[][] rate=new double[USERSIZE+1][VIDEOSIZE+1];//评分矩阵
+        double[][] DeclaredRate=new double[USERSIZE+1][VIDEOSIZE+1];//针对稀疏问题处理后的评分矩阵
 
-        Neighbor[] NofUser =new Neighbor[UN+1];//每个用户的最近的UN个邻居
+        Neighbor[] NofUser =new Neighbor[NEIGHBORS+1];//每个用户的最近的UN个邻居
 
 
         //1 构建rate矩阵
         for (int i = 0; i < scoreList.size(); i++) {
             Score score = scoreList.get(i);
-
             int userID=userMap.get(score.getUserId());
             int itemID=videoMap.get(score.getVideoId());
 //            int userID = scoreList.get(i).getUserId().intValue();
 //            int itemID = scoreList.get(i).getVideoId().intValue();
 
             rate[userID][itemID] = score.getScore();
-
-
         }
 
 //        for (int i = 0; i < rate.length; i++) {
@@ -133,13 +132,12 @@ public class RecommendServiceImpl implements RecommendService {
 //            System.out.println();
 //        }
 
-
-
         //2 计算每个用户的平均分
         //2.1 计算每个用户为几部电影打分
+        int n;
         for(int i=1;i<=USERSIZE;i++){
-            int n=0;
-            for(int j=1;j<=ITEMSIZE;j++){
+            n=0;
+            for(int j=1;j<=VIDEOSIZE;j++){
                 if(rate[i][j]!=0)
                     n++;
             }
@@ -147,8 +145,9 @@ public class RecommendServiceImpl implements RecommendService {
         }
 
         // 2.2计算平均分
+        double sum;
         for(int i=1;i<=USERSIZE;i++){
-            double sum=0.0;
+            sum=0.0;
             for(int j=1;j<rate[i].length;j++){//每个length都是ITEMSIZE=1682
                 sum+=rate[i][j];
             }
@@ -159,27 +158,20 @@ public class RecommendServiceImpl implements RecommendService {
         //重点处理该user对没有被评分的item，会打几分
         //暂时用1-2中计算出的平均分
         for(int i=1;i<=USERSIZE;i++){
-            for(int j=1;j<=ITEMSIZE;j++){
+            for(int j=1;j<=VIDEOSIZE;j++){
                 if(rate[i][j]==0)
-                    DealedOfRate[i][j]=average[i];
+                    DeclaredRate[i][j]=average[i];
                 else
-                    DealedOfRate[i][j]=rate[i][j];
-
-
+                    DeclaredRate[i][j]=rate[i][j];
             }
         }
 
-
-
         //获取最近邻
-
-
         System.out.println("realId:"+userid);
 
         //虚拟出的用户id
         int userID = userMap.get(userid);
 //        int userID = 37;
-
 
         System.out.println("virtualId:"+userID);
 
@@ -187,7 +179,7 @@ public class RecommendServiceImpl implements RecommendService {
         Neighbor[] tmpNeighbor=new Neighbor[USERSIZE+1];
         for(int id=1;id<=USERSIZE;id++){
             if(id!=userID){
-                double sim=Pearson(DealedOfRate[userID],DealedOfRate[id]);
+                double sim=Pearson(DeclaredRate[userID],DeclaredRate[id]);
                 tmpNeighbor[id]=new Neighbor(id,sim);
                 neighborList.add(tmpNeighbor[id]);
 
@@ -197,7 +189,7 @@ public class RecommendServiceImpl implements RecommendService {
 
         int k=1;
         Iterator it=neighborList.iterator();
-        while(k<=UN&&it.hasNext()){
+        while(k<=NEIGHBORS&&it.hasNext()){
             Neighbor tmp=(Neighbor) it.next();
             NofUser[k]=tmp;
             k++;
@@ -210,15 +202,15 @@ public class RecommendServiceImpl implements RecommendService {
 
         List<item> itemList = new ArrayList<>();
         //遍历出所有 最近邻访问过的视频 并剔除自己访问过的
-        for (int i = 1; i <= ITEMSIZE; i++) {
+        for (int i = 1; i <= VIDEOSIZE; i++) {
             if(rate[userID][i]!=0){
                 continue;
             }
-            for (int j = 1; j <= UN; j++) {
+            for (int j = 1; j <= NEIGHBORS; j++) {
                 if(rate[NofUser[j].getID()][i]!=0){
 
 
-                    itemList.add(new item(i,predict(userID,i,UN,NofUser,DealedOfRate,average)));
+                    itemList.add(new item(i,predict(userID,i,NEIGHBORS,NofUser,DeclaredRate,average)));
                     break;
                 }
             }
@@ -247,7 +239,16 @@ public class RecommendServiceImpl implements RecommendService {
 
         Stack<Integer> stack = new Stack<Integer>();
 
+
+        //key为真实id value为虚拟id
+        //到这里已经得到了需要推荐视频的虚拟id 需要转为真实的视频id
+        //外层for循环遍历所有的视频 只遍历一次
+        //内层遍历需要推荐视频的虚拟id是否匹配 如果匹配将真实id加入result中
+        //并使用栈保存虚拟id
+        //内层遍历结束后  将栈中保存的需要清理的虚拟id清除
+        //最后清空栈
         for (Long key : videoMap.keySet()) {
+
 
 
 
@@ -281,7 +282,7 @@ public class RecommendServiceImpl implements RecommendService {
 //        }
 
 
-        System.out.println(System.currentTimeMillis() - s1);
+        System.out.println(System.currentTimeMillis() - startTime);
 
 
         for(VideoVo videoVo:videoList){
@@ -292,50 +293,20 @@ public class RecommendServiceImpl implements RecommendService {
         return Result.ok(videoList);
     }
 
-    @Override
-    public Result scoreVideo(ScoreVideoDto scoreVideoDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        User user = loginUser.getUser();
-        Long userid = user.getUserId();
-
-
-        ScoreExample scoreExample = new ScoreExample();
-        scoreExample.createCriteria()
-                .andUserIdEqualTo(userid)
-                .andVideoIdEqualTo(scoreVideoDto.getVideoId());
-
-        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
-
-
-        Score score = new Score();
-        score.setScore(scoreVideoDto.getScore().byteValue());
-        score.setUserId(userid);
-        score.setVideoId(scoreVideoDto.getVideoId());
-        score.setScoreTime(System.currentTimeMillis());
-
-        if(scoreList.size()==0){
-            scoreMapper.insert(score);
-        }else {
-            score.setScoreId(scoreList.get(0).getScoreId());
-            scoreMapper.updateByPrimaryKey(score);
-        }
-        return Result.ok();
-
-    }
 
 
 
-    //Chapter2：聚类，找和某一用户有相同喜好的一类用户
+
+    //2：聚类，找和某一用户有相同喜好的一类用户
     //2-1：:Pearson计算向量的相似度
     public double Sum(double[] arr){
-        double total=(double)0.0;
+        double total=0.0;
         for(double ele:arr)
             total+=ele;
         return total;
     }
-    public double Mutipl(double[] arr1,double[] arr2,int len){
-        double total=(double)0.0;
+    public double Multiply(double[] arr1, double[] arr2, int len){
+        double total=0.0;
         for(int i=0;i<len;i++)
             total+=arr1[i]*arr2[i];
         return total;
@@ -348,18 +319,18 @@ public class RecommendServiceImpl implements RecommendService {
         else len=leny;
         double sumX=Sum(x);
         double sumY=Sum(y);
-        double sumXX=Mutipl(x,x,len);
-        double sumYY=Mutipl(y,y,len);
-        double sumXY=Mutipl(x,y,len);
+        double sumXX= Multiply(x,x,len);
+        double sumYY= Multiply(y,y,len);
+        double sumXY= Multiply(x,y,len);
         double upside=sumXY-sumX*sumY/len;
         //double downside=(double) Math.sqrt((sumXX-(Math.pow(sumX, 2))/len)*(sumYY-(Math.pow(sumY, 2))/len));
-        double downside=(double) Math.sqrt((sumXX-Math.pow(sumX, 2)/len)*(sumYY-Math.pow(sumY, 2)/len));
+        double downside= Math.sqrt((sumXX-Math.pow(sumX, 2)/len)*(sumYY-Math.pow(sumY, 2)/len));
 
         //System.out.println(len+" "+sumX+" "+sumY+" "+sumXX+" "+sumYY+" "+sumXY);
         return upside/downside;
     }
 
-    //Chapter3:根据最近邻居给出预测评分
+    //3:根据最近邻居给出预测评分
     public double predict(int userID, int itemID,int UN,Neighbor[] NofUser,double[][] DealedOfRate,double[] average){//这里的userID为用户输入，减1后为数组下标！
         double sum1=0;
         double sum2=0;
@@ -371,59 +342,6 @@ public class RecommendServiceImpl implements RecommendService {
         }
         return average[userID]+sum1/sum2;
     }
-
-
-
-    @Override
-    public Result getScore(Long videoId) {
-        ScoreExample scoreExample = new ScoreExample();
-        scoreExample.createCriteria()
-                .andVideoIdEqualTo(videoId)
-                .andUserIdEqualTo(UserUtil.getUserId());
-
-        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
-
-        if(scoreList.size()!=0){
-            return Result.ok(scoreList.get(0));
-        }else {
-            return Result.ok();
-        }
-
-    }
-
-    @Override
-    public Result getIndividualInfo(Long videoId) {
-        UserVideoVo userVideoVo = new UserVideoVo();
-
-        Long userId = UserUtil.getUserId();
-
-        ScoreExample scoreExample = new ScoreExample();
-        scoreExample.createCriteria()
-                .andVideoIdEqualTo(videoId)
-                .andUserIdEqualTo(userId);
-
-        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
-
-        if(scoreList.size()!=0){
-            userVideoVo.setScore(scoreList.get(0).getScore());
-        }
-
-
-        CollectExample collectExample = new CollectExample();
-        collectExample.createCriteria()
-                .andVideoIdEqualTo(videoId)
-                .andUserIdEqualTo(userId);
-
-        List<Collect> collectList = collectMapper.selectByExample(collectExample);
-
-        if(collectList.size()!=0){
-            userVideoVo.setIsCollect(true);
-        }
-
-        return Result.ok(userVideoVo);
-    }
-
-
 }
 
 

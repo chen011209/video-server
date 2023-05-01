@@ -8,6 +8,8 @@ import com.yichen.video.dto.ScoreVideoDto;
 import com.yichen.video.dto.UploadDto;
 import com.yichen.video.model.Comment;
 import com.yichen.video.service.RecommendService;
+import com.yichen.video.service.ScoreService;
+import com.yichen.video.service.UserService;
 import com.yichen.video.service.VideoService;
 import com.yichen.video.vo.Result;
 import com.yichen.video.vo.VideoVo;
@@ -36,6 +38,12 @@ public class VideoController {
 
     @Autowired
     private RecommendService recommendService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ScoreService scoreService;
 
     /**
      * 上传一个视频所有的信息 包括标题、简介
@@ -139,20 +147,20 @@ public class VideoController {
 
     @GetMapping("/score")
     public Result getScore(HttpServletRequest request, HttpServletResponse response, @RequestParam Long  videoId) throws Exception{
-        return recommendService.getScore(videoId);
+        return scoreService.getScore(videoId);
 //        return null;
     }
 
 
     @GetMapping("/user/info")
     public Result getIndividualInfo(HttpServletRequest request, HttpServletResponse response, @RequestParam Long  videoId) throws Exception{
-        return recommendService.getIndividualInfo(videoId);
+        return userService.getIndividualInfo(videoId);
 //        return null;
     }
 
     @PostMapping("/score")
     public Result scoreVideo(HttpServletRequest request, HttpServletResponse response, @RequestBody ScoreVideoDto scoreVideoDto) throws Exception{
-        return recommendService.scoreVideo(scoreVideoDto);
+        return scoreService.scoreVideo(scoreVideoDto);
 //        return null;
     }
 

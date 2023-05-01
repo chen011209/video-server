@@ -4,7 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.yichen.video.Redis.RedisCache;
+import com.yichen.video.dao.CollectMapper;
 import com.yichen.video.dao.FollowMapper;
+import com.yichen.video.dao.ScoreMapper;
 import com.yichen.video.dao.UserMapper;
 import com.yichen.video.dto.AvatarDto;
 import com.yichen.video.dto.EditDto;
@@ -12,15 +14,13 @@ import com.yichen.video.dto.LoginDto;
 import com.yichen.video.dto.RegisterDto;
 import com.yichen.video.enums.ErrorEnum;
 import com.yichen.video.enums.UserTypeEnum;
-import com.yichen.video.model.Follow;
-import com.yichen.video.model.FollowExample;
-import com.yichen.video.model.User;
-import com.yichen.video.model.UserExample;
+import com.yichen.video.model.*;
 import com.yichen.video.service.UserService;
 import com.yichen.video.security.LoginUser;
 import com.yichen.video.util.JwtUtil;
 import com.yichen.video.util.UserUtil;
 import com.yichen.video.vo.Result;
+import com.yichen.video.vo.UserVideoVo;
 import com.yichen.video.vo.UserVo;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +69,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     FollowMapper followMapper;
+
+    @Autowired
+    ScoreMapper scoreMapper;
+
+    @Autowired
+    CollectMapper collectMapper;
 
     @Resource
     private JavaMailSender javaMailSender;
@@ -414,5 +420,35 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
+    public Result getIndividualInfo(Long videoId) {
+        UserVideoVo userVideoVo = new UserVideoVo();
 
+        Long userId = UserUtil.getUserId();
+
+        ScoreExample scoreExample = new ScoreExample();
+        scoreExample.createCriteria()
+                .andVideoIdEqualTo(videoId)
+                .andUserIdEqualTo(userId);
+
+        List<Score> scoreList = scoreMapper.selectByExample(scoreExample);
+
+        if(scoreList.size()!=0){
+            userVideoVo.setScore(scoreList.get(0).getScore());
+        }
+
+
+        CollectExample collectExample = new CollectExample();
+        collectExample.createCriteria()
+                .andVideoIdEqualTo(videoId)
+                .andUserIdEqualTo(userId);
+
+        List<Collect> collectList = collectMapper.selectByExample(collectExample);
+
+        if(collectList.size()!=0){
+            userVideoVo.setIsCollect(true);
+        }
+
+        return Result.ok(userVideoVo);
+    }
 }

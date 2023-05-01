@@ -1,9 +1,11 @@
 package com.yichen.video.util.sensitiveWord;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -90,6 +92,18 @@ public class SensitiveWordInit {
                 }
             }
         }
+
+
+    }
+
+    public static String readInputFromStream(InputStream input) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line).append("\n");
+        }
+        return stringBuilder.toString();
     }
 
     /**
@@ -98,19 +112,26 @@ public class SensitiveWordInit {
     private Set<String> readSensitiveWordFile() throws Exception{
         Set<String> set = null;
 
-        File file = new File("D:\\bishe\\video-server\\src\\main\\java\\com\\yichen\\video\\util\\sensitiveWord\\SensitiveWord.txt");    //读取文件
-        InputStreamReader read = new InputStreamReader(new FileInputStream(file),ENCODING);
+//        File file = new File("D:\\bishe\\video-server\\src\\main\\java\\com\\yichen\\video\\util\\sensitiveWord\\SensitiveWord.txt");    //读取文件
+
+//        ClassLoader classLoader = getClass().getClassLoader();
+//        File file = new File(classLoader.getResource("static/SensitiveWord.txt").getFile());
+
+
+        InputStream inputStream = new ClassPathResource("static/SensitiveWord.txt").getInputStream();
+
+
+//        System.out.println(readInputFromStream(inputStream));
+
+
+
+        InputStreamReader read = new InputStreamReader(inputStream,ENCODING);
         try {
-            if(file.isFile() && file.exists()){      //文件流是否存在
-                set = new HashSet<String>();
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String txt = null;
-                while((txt = bufferedReader.readLine()) != null){    //读取文件，将文件内容放入到set中
-                    set.add(txt);
-                }
-            }
-            else{         //不存在抛出异常信息
-                throw new Exception("敏感词库文件不存在");
+            set = new HashSet<String>();
+            BufferedReader bufferedReader = new BufferedReader(read);
+            String txt = null;
+            while((txt = bufferedReader.readLine()) != null){    //读取文件，将文件内容放入到set中
+                set.add(txt);
             }
         } catch (Exception e) {
             throw e;

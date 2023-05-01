@@ -36,5 +36,6 @@ public interface UserService {
     PageInfo<UserVo> followList(int pageNum, int pageSize);
 
 
+    Result getIndividualInfo(Long videoId);
 
 }
