@@ -35,23 +35,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     //加密的bean在config中
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-
-
         UserExample userExample = new UserExample();
         userExample.setDistinct(true);
         UserExample.Criteria userCriteria = userExample.createCriteria();
-
         userCriteria.andUserEmailEqualTo(mail);
-
-
         //只要按照mail将数据库中的user取出(主要是密码) 后续security会在authenticate方法中比对密码
         User user = userMapper.selectByExample(userExample).get(0);
-
-
-//        if (userList.size()==0) {
-//            throw new RuntimeException("用户账号或密码错误");
-//        }
-
         // 因为返回值是UserDetails，所有需要定义一个类，实现UserDetails，把用户信息封装在其中
         //根据用户查询权限信息 添加到LoginUser中
         List<String> list;

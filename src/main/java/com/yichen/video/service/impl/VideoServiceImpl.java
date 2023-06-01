@@ -231,6 +231,8 @@ public class VideoServiceImpl implements VideoService {
 	public void getPicture(HttpServletResponse response, String picturePath) {
 		try {
 			//        File file = new File("D:\\bishe\\video-repository\\picture\\39\\1678626562935.jpg");
+
+
 			File file = new File(picturePath);
 			BufferedImage image = ImageIO.read(file);
 

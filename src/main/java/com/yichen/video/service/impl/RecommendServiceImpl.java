@@ -229,9 +229,18 @@ public class RecommendServiceImpl implements RecommendService {
         });
 
 
+        Random random = new Random();
+
+        int randomSeed = random.nextInt()%10;   //0到9
+
+
+
         HashSet<Integer> hashSet = new HashSet<>(17);
         for (int i = 0; i < 17; i++) {
-            hashSet.add(itemList.get(i).id);
+
+
+            //将结果排序后随机选取17个加入list
+            hashSet.add(itemList.get(i).id+randomSeed);
 //            System.out.println("virtualID:"+itemList.get(i).id);
         }
 

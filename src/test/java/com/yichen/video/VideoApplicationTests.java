@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Random;
 import java.util.logging.Logger;
 
 @SpringBootTest
@@ -184,8 +186,79 @@ class VideoApplicationTests {
 //        }
 //    }
 //
-//    @Autowired
-//    VideoMapper videoMapper;
+    @Autowired
+    VideoMapper videoMapper;
+
+
+
+
+    @Test
+	public  void update(){
+
+
+    	VideoExample videoExample = new VideoExample();
+    	videoMapper.selectByExample(videoExample);
+
+
+
+	}
+
+    @Test
+	public void updateVideo(){
+
+		HashMap videoTitleMap = new HashMap();
+
+		videoTitleMap.put(2,"dark souls");
+		videoTitleMap.put(3,"Edge居然能这么离谱");
+		videoTitleMap.put(4,"如果白夜选择艾尔文");
+		videoTitleMap.put(5,"Edge结合chatGpt");
+		videoTitleMap.put(6,"SpaceX公司将发射世界上第一个商业空间站");
+		videoTitleMap.put(7,"Windows12粉丝版概念设计宣传片");
+		videoTitleMap.put(8,"一线城市人口负增长时代");
+		videoTitleMap.put(9,"一个人摩旅");
+
+		HashMap videoIntroductionMap = new HashMap();
+
+		videoIntroductionMap.put(2,"dark souls");
+		videoIntroductionMap.put(3,"Edge使用技巧");
+		videoIntroductionMap.put(4,"白夜选择艾尔文的一些思考");
+		videoIntroductionMap.put(5,"Edge结合chatGpt解锁最强浏览器");
+		videoIntroductionMap.put(6,"SpaceX发射商业空间站");
+		videoIntroductionMap.put(7,"Windows12粉丝版概念设计宣传片：任务栏史上最大升级，桌面交互彻底重");
+		videoIntroductionMap.put(8,"见证历史，一线城市人口负增长时代，重磅来袭");
+		videoIntroductionMap.put(9,"我永远热爱一个人摩旅在路上的自由与无拘，这些经历将会是我未来沉闷生活岁月里的解药。");
+
+    	Video video = new Video();
+		for (int i = 1; i < 1699; i++) {
+
+			int random;
+			Random random1 = new Random();
+
+//			2到9
+			random = Math.abs(random1.nextInt()%8)+2;
+			video.setVideoId(Long.parseLong(String.valueOf(i)));
+
+
+
+			video.setPicturePath("D:\\bishe\\video-repository\\picture\\1000\\168465491406"+random+".jpg");
+			video.setVideoPath("D:\\bishe\\video-repository\\video\\1000\\168465491406"+random+".mp4");
+
+
+
+			video.setVideoTitle("视频("+i+") "+videoTitleMap.get(random));
+			video.setVideoIntroduction((String) videoIntroductionMap.get(random));
+
+			videoMapper.updateByPrimaryKeySelective(video);
+
+		}
+
+
+	}
+
+
+
+
+
 //    @Test
 //    public void insertVideo(){
 //
